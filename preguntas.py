@@ -7,6 +7,7 @@ Este archivo contiene las preguntas que se van a realizar en el laboratorio.
 Utilice los archivos `tbl0.tsv`, `tbl1.tsv` y `tbl2.tsv`, para resolver las preguntas.
 
 """
+from multiprocessing.sharedctypes import Value
 import pandas as pd
 
 tbl0 = pd.read_csv("tbl0.tsv", sep="\t")
@@ -197,8 +198,11 @@ def pregunta_12():
     38   38                    eee:0,fff:9,iii:2
     39   39                    ggg:3,hhh:8,jjj:5
     """
-    return
-
+    lista_c5 = [(linea[1]+':'+str(linea[2])) for linea in tbl2.values]
+    columna_c5 = tbl2.assign(_c5 = lista_c5)
+    columna_c5_ordenada = columna_c5.sort_values('_c5')
+    final = columna_c5_ordenada.groupby(['_c0'], as_index=False).agg({'_c5':','.join})
+    return final
 
 def pregunta_13():
     """
@@ -214,4 +218,7 @@ def pregunta_13():
     E    275
     Name: _c5b, dtype: int64
     """
-    return
+    nueva_tabla = pd.merge(tbl0,tbl2,left_on='_c0',right_on='_c0',how='outer')
+    nueva_tabla = nueva_tabla[['_c1','_c5b']]
+    nueva_tabla = nueva_tabla.groupby(['_c1'])['_c5b'].sum()
+    return nueva_tabla
